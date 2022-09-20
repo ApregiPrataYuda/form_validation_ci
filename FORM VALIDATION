@@ -1,0 +1,163 @@
+//controller
+public function Tambah()
+  {
+    //for declaration
+    $this->form_validation->set_rules('name', 'Nama Posisi* ', 'required|min_length[3]|is_unique[posisi.name]|alpha');
+    $this->form_validation->set_rules('kode_posisi', 'Kode Posisi* ', 'required|min_length[3]|is_unique[posisi.kode_posisi]|numeric');
+
+    //for shoot message 
+    $this->form_validation->set_message('required', '{field}  Masih kosong, silakan di isi dulu?');
+    $this->form_validation->set_message('min_length', '{field} Minimal Panjang Lebih dari 3 karakter?');
+    $this->form_validation->set_message('is_unique', '{field} sudah Ada silakan ganti yg lain?');
+    $this->form_validation->set_message('alpha', '{field} Silakan Masukan Karakter Alphabet Bukan Angka?');
+    $this->form_validation->set_message('numeric', '{field} Silakan Masukan Karakter Angka?');
+
+    //for costum
+    $this->form_validation->set_error_delimiters(' <span class="badge badge-danger"></span>');
+
+    if ($this->form_validation->run() == FALSE) {
+      $this->template->load('Template', 'Posisi/Posisi_form_add');
+    } else {
+      $post =  $this->input->post(null, true);
+      $this->Posisi_m->add($post);
+      if ($this->db->affected_rows() > 0) {
+        $this->session->set_flashdata('pesan', 'data berhasil di simpan');
+      }
+      redirect('Posisi');
+    }
+  }
+
+
+  public function edit($id)
+  {
+
+    //for declaration
+    $this->form_validation->set_rules('name', 'Nama Posisi* ', 'required|min_length[3]|alpha');
+    $this->form_validation->set_rules('kode_posisi', 'Kode Posisi* ', 'required|min_length[3]|numeric');
+    //for shoot message 
+    $this->form_validation->set_message('required', '{field}  Masih kosong, silakan di isi dulu?');
+    $this->form_validation->set_message('min_length', '{field} Minimal Panjang Lebih dari 3 karakter?');
+    //$this->form_validation->set_message('is_unique', '{field} sudah Ada silakan ganti yg lain?');
+    $this->form_validation->set_message('alpha', '{field} Silakan Masukan Karakter Alphabet Bukan Angka?');
+    $this->form_validation->set_message('numeric', '{field} Silakan Masukan Karakter Angka?');
+    //for costum
+    $this->form_validation->set_error_delimiters(' <span class="badge badge-danger"></span>');
+
+
+    if ($this->form_validation->run() == FALSE) {
+      $query =  $this->Posisi_m->get($id);
+      if ($query->num_rows() > 0) {
+        $data['row'] = $query->row();
+        $this->template->load('Template', 'Posisi/Posisi_form_edit', $data);
+      } else {
+        $this->session->set_flashdata('error', 'data Tidak Ditemukan');
+        redirect('Posisi');
+      }
+    } else {
+      $post =  $this->input->post(null, true);
+      $this->Posisi_m->edit($post);
+      if ($this->db->affected_rows() > 0) {
+        $this->session->set_flashdata('pesan', 'data berhasil di edit');
+      }
+      redirect('Posisi');
+    }
+  }
+
+  public function delete($id)
+  {
+    $this->Posisi_m->delete($id);
+    if ($this->db->affected_rows() > 0) {
+      $this->session->set_flashdata('pesan', 'data berhasil di hapus');
+    }
+    redirect('Posisi');
+  }
+}
+
+
+//add form
+<!-- Begin Page Content -->
+<div class="container-fluid">
+
+  <!-- Page Heading -->
+  <div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-2 text-gray-800"><span class="badge badge-primary">Tambah Data Posisi</span></h1>
+    <a href="<?= site_url('Posisi') ?>" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i class="fas fa-building fa-sm text-white-50"></i> Back Data Posisi</a>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-6">
+      <div class="card mb-4 py-3 border-bottom-primary  border-left-primary">
+        <div class="card-body">
+          <form action="" method="post">
+
+
+
+            <div class="form-group <?= form_error('name') ? 'has-error' : null ?> col-lg-10">
+              <label style="color:blue;" for="name">Nama Posisi*</label>
+              <input type="text" name="name" value="<?= set_value('name'); ?>" class="form-control" placeholder="Nama Posisi">
+              <span class="badge badge-danger col-lg-10"><?= form_error('name') ?></span>
+            </div>
+
+            <div class="form-group <?= form_error('kode_posisi') ? 'has-error' : null ?> col-lg-10">
+              <label style="color:blue;" for="kode_posisi">Kode Posisi*</label>
+              <input type="text" name="kode_posisi" value="<?= set_value('kode_posisi'); ?>" class="form-control" placeholder="Kode Posisi">
+              <span class="badge badge-danger col-lg-10"><?= form_error('kode_posisi') ?></span>
+            </div>
+
+
+            <div class="form-group">
+              <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane"></i> save</button>
+              <button type="reset" class="btn btn-warning"><i class="fa fa-undo"></i> reset</button>
+              </>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+//edit form
+<!-- Begin Page Content -->
+<div class="container-fluid">
+
+  <!-- Page Heading -->
+  <div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-2 text-gray-800"><span class="badge badge-primary">Tambah Data Posisi</span></h1>
+    <a href="<?= site_url('Posisi') ?>" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i class="fas fa-building fa-sm text-white-50"></i> Back Data Posisi</a>
+  </div>
+  <div id="flasherr" data-flasherr="<?= $this->session->flashdata('error') ?>"></div>
+  <div class="row">
+    <div class="col-lg-6">
+      <div class="card mb-4 py-3 border-bottom-primary  border-left-primary">
+        <div class="card-body">
+          <form action="" method="post">
+
+
+
+            <div class="form-group <?= form_error('name') ? 'has-error' : null ?> col-lg-10">
+              <label style="color:blue;" for="name">Nama Posisi*</label>
+              <input type="hidden" name="posisi_id" value="<?= $row->posisi_id ?>">
+              <input type="text" name="name" value="<?= $this->input->post('name') ?? $row->name ?>" class="form-control" placeholder="Nama Posisi">
+              <span class="badge badge-danger col-lg-10"><?= form_error('name') ?></span>
+            </div>
+
+            <div class="form-group <?= form_error('kode_posisi') ? 'has-error' : null ?> col-lg-10">
+              <label style="color:blue;" for="kode_posisi">Kode Posisi*</label>
+              <input type="text" name="kode_posisi" value="<?= $this->input->post('kode_posisi') ?? $row->kode_posisi ?>" class="form-control" placeholder="Kode Posisi">
+              <span class="badge badge-danger col-lg-10"><?= form_error('kode_posisi') ?></span>
+            </div>
+
+
+            <div class="form-group">
+              <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane"></i> save</button>
+              <button type="reset" class="btn btn-warning"><i class="fa fa-undo"></i> reset</button>
+              </>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
